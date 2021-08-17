@@ -16,7 +16,7 @@ public class TestServer {
     public static void main(String[] args) {
         UserServiceImpl userService = new UserServiceImpl();
         BlogServiceImpl blogService = new BlogServiceImpl();
-        ServiceProvider serviceProvider = new ServiceProvider();
+        ServiceProvider serviceProvider = new ServiceProvider("127.0.0.1", 8787);
         serviceProvider.provideServiceInstance(userService);
         serviceProvider.provideServiceInstance(blogService);
 

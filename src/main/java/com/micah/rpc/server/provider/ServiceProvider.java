@@ -1,5 +1,9 @@
 package com.micah.rpc.server.provider;
 
+import com.micah.rpc.register.ServiceRegister;
+import com.micah.rpc.register.impl.ZkServiceRegister;
+
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +18,15 @@ public class ServiceProvider {
      * 一个类可能实现多个接口
      */
     private final Map<String, Object> serviceMap;
+    private final ServiceRegister serviceRegister;
+    private final String host;
+    private final int port;
 
-    public ServiceProvider() {
+    public ServiceProvider(String host, int port) {
+        this.host = host;
+        this.port = port;
         this.serviceMap = new HashMap<>();
+        this.serviceRegister = new ZkServiceRegister();
     }
 
     /**
@@ -27,7 +37,10 @@ public class ServiceProvider {
         Class<?>[] interfaces = service.getClass().getInterfaces();
 
         for (Class<?> clazz : interfaces) {
+            //本机服务映射Map
             serviceMap.put(clazz.getName(), service);
+            //new code, update in 2021/8/17 --- 注册服务
+            serviceRegister.register(clazz.getName(),new InetSocketAddress(host, port));
         }
     }
 

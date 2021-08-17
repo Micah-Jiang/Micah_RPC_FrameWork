@@ -15,7 +15,7 @@ import com.micah.rpc.service.UserService;
 public class ClientTest {
     public static void main(String[] args) {
         // 构建一个使用java Socket传输的客户端
-        RpcClient rpcClient = new NettyRpcClient("127.0.0.1", 8787);
+        RpcClient rpcClient = new NettyRpcClient();
         // 把这个客户端传入代理客户端
         ClientProxy clientProxy = new ClientProxy(rpcClient);
         // 代理客户端根据不同的服务，获得一个代理类， 并且这个代理类的方法以或者增强（封装数据，发送请求）
