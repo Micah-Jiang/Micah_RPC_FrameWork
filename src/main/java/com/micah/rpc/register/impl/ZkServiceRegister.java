@@ -1,5 +1,7 @@
 package com.micah.rpc.register.impl;
 
+import com.micah.rpc.loadbalance.LoadBalance;
+import com.micah.rpc.loadbalance.impl.RandomLoadBalance;
 import com.micah.rpc.register.ServiceRegister;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -26,6 +28,10 @@ public class ZkServiceRegister implements ServiceRegister {
      * zookeeper根路径结点
      */
     private static final String ROOT_PATH = "micah_rpc";
+    /**
+     * 初始化负载均衡器， 这里用的是随机， 一般通过构造函数传入
+     */
+    private LoadBalance loadBalance = new RandomLoadBalance();
 
     /**
      * 负责zookeeper客户端的初始化，并与zookeeper服务端建立连接
@@ -62,10 +68,10 @@ public class ZkServiceRegister implements ServiceRegister {
     @Override
     public InetSocketAddress serviceDiscovery(String serviceName) {
         try {
-            List<String> strings = client.getChildren().forPath("/" + serviceName);
+            List<String> addressList = client.getChildren().forPath("/" + serviceName);
             // 这里默认用的第一个，后面加负载均衡
-            String string = strings.get(0);
-            return parseAddress(string);
+            String address = loadBalance.balance(addressList);
+            return parseAddress(address);
         } catch (Exception e) {
             e.printStackTrace();
         }
